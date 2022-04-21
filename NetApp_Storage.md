@@ -91,12 +91,19 @@ BRE (suited for disaster type of scenario) = Tracks each "block" and is unaware 
 Replication is little slower then XDP (since it tracks each block change and replicate the same to destination)
 
 ### what is portset?
+Portsets are a collection of ports that can be associated with an igroup. Portsets are used to limit the ports that can be used by the initiators in the igroup to access a target lun.
 
 ### What is initiator group?
+Initiator groups (igroups) are tables of FC protocol host WWPNs or iSCSI host node names. You can define igroups and map them to LUNs to control which initiators have access to LUNs.
+
 ### How to solve CIFS unaccessible issue?
 ### How to solve NFS unaccessible issue?
 ### What is infinite volume?
+An Infinite Volume is a single, scalable volume that can store up to 2 billion files and tens of petabytes of data. Infinite Volumes are designed to address the needs of large unstructured repositories of data, which are also known as enterprise content repositories.
+
 ### What is flexgroup volume?
+FlexGroups combine local WAFL® file systems in a distributed storage cluster to provide a single namespace that seamlessly scales across the aggregate resources of the cluster (CPU, storage, etc.) while preserving the features and robustness of the WAFL file system.
+
 ### How to convert DP to XDP snapmirror relationship?
 - Snapmirror quiesce  -source-path svm:volA -destination-path svm:volb
 - snapmirror break -source-path svm:volA -destination-path svm:volb
@@ -130,8 +137,33 @@ You can run cluster setup from Command line (Connect to  as well as from GUI onc
 RAID-TEC is supported on all disk types and all platforms, including AFF. Aggregates that contain larger disks have a higher possibility of concurrent disk failures. RAID-TEC helps to mitigate this risk by providing triple-parity protection so that your data can survive up to three simultaneous disk failures. RAID-TEC is the default RAID policy for capacity HDD aggregates with disks that are 6 TB or larger. If 4 disks failed RAID-TEC will go into degraded mode (we may not able to recover the data).
 
 ### Why we need to do portset?
+Portsets are used to limit the ports that can be used by the initiators in the igroup to access a target lun.
+
 ### What is the maximum capacity of the volume in cluster mode ?
-### Client is reporting CIFS shares slowness how will you resolve
+Its a model depedent however most of the models support 200TB as Max.
+
+### Client is reporting CIFS shares slowness how will you resolve?
+- Check Network connectivity fron client end is good.
+- check is there any larger I/O in NetApp
+- check CIFS hosted node performance (there should be no CPU/Memory/Network I/O issue)
+- checks statistics on Netapp and see
+- check CIFS sessions
+- check associated LIF and underlining Physical interfaces having any issues.
+- check aggregates space is filled up.
+- check cluster status is there any giveback/failover activities going on
+- if all looks good open a NetApp ticket
+
 ### NFS client is reporting latency how will you resolve
+- check NFS protocol version (verify version is compatible).
+- unmount and remount if possible
+- restart the server to clear unwanted threads
+- Check Cluster performance
+- check export policies 
+- check LIF status and its data transfer rate
+- If all looks good then open a case with NetApp support 
+
 ### How Data Read Request processes in Netapp?
+Client send the data to NetApp network interface (DATA LIF) --> NetApp receive the data and write to NVRAM then send acknowlegment to client saying that you data is written. After that NetApp triggers a CP (consistent point) then it actually writes to the disk.
+
 ### Explain NetApp Architecture
+NetApp will have multiple physical nodes (Minimum two for Ha Pair). Nodes are connected using internal network cables for cluster. If nodes are more than 4 then it required to have intercluster switch to connect multiple nodes. Diskshelfs will be connected to all the nodes with multiple paths. Within ONTAP it has SVMs (Storage virtual machines), Aggregates, Volumes, LUNs, LIFs.
